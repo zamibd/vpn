@@ -1,0 +1,56 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+backend/vpn-server
+*.o
+*.a
+*.so
+*.out
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker
+.docker/
+docker compose.override.local.yml
+
+# Logs
+*.log
+logs/
+
+# Database
+*.sql
+!database/schema.sql
+!database/migration.sql
+
+# Node modules (if used)
+node_modules/
+package-lock.json
+
+# Go
+go.sum
+vendor/
+*.mod.bak
+
+# Secrets
+certs/
+secrets/
+
+# Backups
+*.backup
+*.bak
+backup/
+backups/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
