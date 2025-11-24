@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'https://bdtunnel.com/api';
 
 // Load packages on homepage
 async function loadPackages() {

@@ -45,7 +45,7 @@ MySQL স্বাস্থ্যকর হওয়ার জন্য অপ�
 
 ### ধাপ ৩: ব্রাউজারে খুলুন
 ```
-http://localhost
+https://bdtunnel.com
 ```
 
 ### ধাপ ৪: লগইন করুন
@@ -63,7 +63,7 @@ Password: 654321
 ```
 ┌─────────────────────────────────────────────────────┐
 │                   আপনার ব্রাউজার                      │
-│                  http://localhost                   │
+│                  https://bdtunnel.com               │
 └────────────────────┬────────────────────────────────┘
                      │
         ┌────────────▼────────────┐
@@ -182,10 +182,10 @@ docker compose -f docker compose.prod.yml up -d
 
 | সেবা | URL | পোর্ট | বর্ণনা |
 |------|-----|-------|--------|
-| Frontend | http://localhost | 80 | Nginx দ্বারা serve |
-| Backend API | http://localhost:8080 | 8080 | সরাসরি API প্রবেশ |
+| Frontend | https://bdtunnel.com | 80 | Nginx দ্বারা serve |
+| Backend API | https://bdtunnel.com/api | 8080 | সরাসরি API প্রবেশ |
 | MySQL | localhost:3306 | 3306 | ডাটাবেস সংযোগ |
-| HTTPS | https://localhost | 443 | Production (SSL configure করার পর) |
+| HTTPS | https://bdtunnel.com | 443 | Production (SSL configure করার পর) |
 
 ---
 
@@ -241,12 +241,12 @@ docker compose exec mysql mysql \
 
 ### সব প্যাকেজ পান
 ```bash
-curl http://localhost:8080/api/packages
+curl https://bdtunnel.com/api/packages
 ```
 
 ### লগইন করুন
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST https://bdtunnel.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"123456","password":"654321"}'
 ```
@@ -254,7 +254,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 ### প্রোফাইল পান (Token দিয়ে)
 ```bash
 curl -H "Authorization: Bearer TOKEN_HERE" \
-  http://localhost:8080/api/user/profile
+  https://bdtunnel.com/api/user/profile
 ```
 
 ---
@@ -465,7 +465,7 @@ docker compose up -d
 docker compose logs -f
 
 # ব্রাউজারে খুলুন
-# http://localhost
+# https://bdtunnel.com
 ```
 
 ---

@@ -13,7 +13,7 @@ MySQL will initialize automatically with the schema.
 
 ### Step 3: Open Browser
 ```
-http://localhost
+https://bdtunnel.com
 ```
 
 ### Step 4: Login
@@ -50,8 +50,8 @@ docker-compose ps
 
 | Service | URL | Purpose |
 |---------|-----|---------|
-| Frontend | http://localhost | Web interface |
-| Backend API | http://localhost:8080 | Direct API access |
+| Frontend | https://bdtunnel.com | Web interface |
+| Backend API | https://bdtunnel.com/api | Direct API access |
 | MySQL | localhost:3306 | Database |
 
 ### Default Credentials
@@ -158,12 +158,12 @@ docker-compose exec mysql mysql -u vpn_user -pvpn_password vpn_management \
 
 ### Get Packages
 ```bash
-curl http://localhost:8080/api/packages
+curl https://bdtunnel.com/api/packages
 ```
 
 ### Login Request
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST https://bdtunnel.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"123456","password":"654321"}'
 ```
@@ -171,7 +171,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 ### Get Profile (with token)
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN_HERE" \
-  http://localhost:8080/api/user/profile
+  https://bdtunnel.com/api/user/profile
 ```
 
 ## Next Steps
