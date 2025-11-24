@@ -51,6 +51,9 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    # Security: Run with read-only root filesystem where possible
+    security_opt:
+      - no-new-privileges:true
 
   # Nginx Reverse Proxy
   nginx:
@@ -62,12 +65,22 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./frontend:/usr/share/nginx/html:ro
+      # Mount SSL certificates if they exist on the host
+      # Uncomment for production with Let's Encrypt certificates
+      # - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       backend:
         condition: service_healthy
     networks:
       - vpn-network
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /var/run
+      - /var/cache/nginx
+      - /var/log/nginx
 
 volumes:
   mysql_data:
