@@ -18,6 +18,24 @@ func init() {
 	godotenv.Load(".env")
 }
 
+// CORS middleware
+func CORSMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Max-Age", "3600")
+
+		// Handle preflight requests
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	var err error
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
@@ -43,31 +61,34 @@ func main() {
 	router := mux.NewRouter()
 
 	// Public routes
-	router.HandleFunc("/api/auth/register", RegisterHandler).Methods("POST")
-	router.HandleFunc("/api/auth/login", LoginHandler).Methods("POST")
+	router.HandleFunc("/api/auth/register", RegisterHandler).Methods("POST", "OPTIONS")
+	router.HandleFunc("/api/auth/login", LoginHandler).Methods("POST", "OPTIONS")
 
 	// Protected routes - use Handle for http.Handler
-	router.Handle("/api/user/profile", AuthMiddleware(http.HandlerFunc(GetUserProfile))).Methods("GET")
-	router.Handle("/api/user/update", AuthMiddleware(http.HandlerFunc(UpdateUserProfile))).Methods("PUT")
-	router.Handle("/api/user/delete", AuthMiddleware(http.HandlerFunc(DeleteUserAccount))).Methods("DELETE")
+	router.Handle("/api/user/profile", AuthMiddleware(http.HandlerFunc(GetUserProfile))).Methods("GET", "OPTIONS")
+	router.Handle("/api/user/update", AuthMiddleware(http.HandlerFunc(UpdateUserProfile))).Methods("PUT", "OPTIONS")
+	router.Handle("/api/user/delete", AuthMiddleware(http.HandlerFunc(DeleteUserAccount))).Methods("DELETE", "OPTIONS")
 
 	// Admin routes
-	router.Handle("/api/admin/users", AuthMiddleware(AdminOnly(GetAllUsers))).Methods("GET")
-	router.Handle("/api/admin/users/{id}", AuthMiddleware(AdminOnly(GetUserByID))).Methods("GET")
-	router.Handle("/api/admin/users/{id}/suspend", AuthMiddleware(AdminOnly(SuspendUser))).Methods("PUT")
-	router.Handle("/api/admin/users/{id}/activate", AuthMiddleware(AdminOnly(ActivateUser))).Methods("PUT")
-	router.Handle("/api/admin/users/{id}/delete", AuthMiddleware(AdminOnly(AdminDeleteUser))).Methods("DELETE")
+	router.Handle("/api/admin/users", AuthMiddleware(AdminOnly(GetAllUsers))).Methods("GET", "OPTIONS")
+	router.Handle("/api/admin/users/{id}", AuthMiddleware(AdminOnly(GetUserByID))).Methods("GET", "OPTIONS")
+	router.Handle("/api/admin/users/{id}/suspend", AuthMiddleware(AdminOnly(SuspendUser))).Methods("PUT", "OPTIONS")
+	router.Handle("/api/admin/users/{id}/activate", AuthMiddleware(AdminOnly(ActivateUser))).Methods("PUT", "OPTIONS")
+	router.Handle("/api/admin/users/{id}/delete", AuthMiddleware(AdminOnly(AdminDeleteUser))).Methods("DELETE", "OPTIONS")
 
 	// Reseller routes
-	router.Handle("/api/reseller/create-user", AuthMiddleware(ResellerOnly(ResellerCreateUser))).Methods("POST")
-	router.Handle("/api/reseller/users", AuthMiddleware(ResellerOnly(ResellerGetUsers))).Methods("GET")
-	router.Handle("/api/reseller/quota", AuthMiddleware(ResellerOnly(ResellerGetQuota))).Methods("GET")
+	router.Handle("/api/reseller/create-user", AuthMiddleware(ResellerOnly(ResellerCreateUser))).Methods("POST", "OPTIONS")
+	router.Handle("/api/reseller/users", AuthMiddleware(ResellerOnly(ResellerGetUsers))).Methods("GET", "OPTIONS")
+	router.Handle("/api/reseller/quota", AuthMiddleware(ResellerOnly(ResellerGetQuota))).Methods("GET", "OPTIONS")
 
 	// Packages route
-	router.HandleFunc("/api/packages", GetPackages).Methods("GET")
+	router.HandleFunc("/api/packages", GetPackages).Methods("GET", "OPTIONS")
 
 	// Static files
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("../frontend")))
+
+	// Apply CORS middleware to all routes
+	handler := CORSMiddleware(router)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -75,5 +96,5 @@ func main() {
 	}
 
 	log.Printf("Server running on port %s", port)
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
