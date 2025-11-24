@@ -61,4 +61,4 @@ INSERT INTO packages (name, days, price, description) VALUES
 
 -- Create sample admin user (username: 123456, password: 654321)
 INSERT INTO users (username, password, email, role, status, expires_at) VALUES
-('123456', '654321', 'admin@vpn.local', 'admin', 'active', '2099-12-31 00:00:00');
+('123456', '654321', 'admin@vpn.local', 'admin', 'active', '2030-12-31 00:00:00');
