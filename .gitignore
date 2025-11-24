@@ -36,7 +36,6 @@ node_modules/
 package-lock.json
 
 # Go
-go.sum
 vendor/
 *.mod.bak
 
