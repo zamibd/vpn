@@ -1,4 +1,4 @@
-const API_URL = 'http://bdtunnel.com/api';
+const API_URL = 'https://bdtunnel.com/api';
 
 let currentUser = null;
 let token = null;
