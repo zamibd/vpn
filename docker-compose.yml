@@ -2,7 +2,7 @@ services:
   # MySQL Database
   mysql:
     image: mysql:${MYSQL_VERSION}
-    container_name: vpn-mysql
+    container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
@@ -14,7 +14,7 @@ services:
       - mysql_data:/var/lib/mysql
       - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     networks:
-      - vpn-network
+      - network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -26,7 +26,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vpn-backend
+    container_name: backend
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
@@ -43,8 +43,8 @@ services:
       mysql:
         condition: service_healthy
     networks:
-      - vpn-network
-    restart: unless-stopped
+      - network
+    restart: always
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/packages"]
       interval: 10s
@@ -58,7 +58,7 @@ services:
   # Nginx Reverse Proxy
   nginx:
     image: nginx:${NGINX_VERSION}
-    container_name: vpn-nginx
+    container_name: nginx
     ports:
       - "80:80"
       - "443:443"
@@ -67,13 +67,13 @@ services:
       - ./frontend:/usr/share/nginx/html:ro
       # Mount SSL certificates if they exist on the host
       # Uncomment for production with Let's Encrypt certificates
-      # - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       backend:
         condition: service_healthy
     networks:
-      - vpn-network
-    restart: unless-stopped
+      - network
+    restart: always
     security_opt:
       - no-new-privileges:true
     read_only: true
