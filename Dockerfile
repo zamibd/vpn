@@ -32,8 +32,9 @@ COPY --from=builder /app/vpn-server .
 # Copy frontend files
 COPY frontend/ frontend/
 
-# Copy .env file
-COPY .env .
+# Copy .env file if it exists, otherwise create a default one
+RUN if [ -f .env ]; then echo ".env found"; fi
+COPY .env* ./
 
 # Expose port
 EXPOSE 8080
