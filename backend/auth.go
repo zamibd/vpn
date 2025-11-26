@@ -190,6 +190,103 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// Public user registration for VPN package purchase
+func PublicRegisterHandler(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Email     string `json:"email"`
+		Password  string `json:"password"`
+		PackageID int    `json:"package_id"`
+		FullName  string `json:"full_name"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	// Validate required fields
+	if req.Email == "" || req.Password == "" || req.PackageID == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(AuthResponse{Error: "Email, password, and package selection are required"})
+		return
+	}
+
+	// Check if email already exists
+	var existingID int
+	err := db.QueryRow("SELECT id FROM users WHERE email = ?", req.Email).Scan(&existingID)
+	if err == nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(AuthResponse{Error: "Email address is already registered"})
+		return
+	}
+
+	// Get package details to calculate expiry
+	var pkg struct {
+		ID    int     `json:"id"`
+		Name  string  `json:"name"`
+		Days  int     `json:"days"`
+		Price float64 `json:"price"`
+	}
+
+	err = db.QueryRow("SELECT id, name, days, price FROM packages WHERE id = ?", req.PackageID).Scan(
+		&pkg.ID, &pkg.Name, &pkg.Days, &pkg.Price,
+	)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(AuthResponse{Error: "Invalid package selected"})
+		return
+	}
+
+	// Generate username (6-digit number)
+	username := generateRandomDigits(6)
+
+	// Calculate expiry date based on package
+	expiresAt := time.Now().AddDate(0, 0, pkg.Days)
+
+	// Create user account
+	result, err := db.Exec(
+		"INSERT INTO users (username, password, role, email, status, expires_at, full_name, package_id) VALUES (?, ?, 'user', ?, 'active', ?, ?, ?)",
+		username, hashPassword(req.Password), req.Email, expiresAt, req.FullName, pkg.ID,
+	)
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(AuthResponse{Error: "Registration failed: " + err.Error()})
+		return
+	}
+
+	userID, _ := result.LastInsertId()
+
+	// Generate token for immediate login
+	token, err := generateToken(int(userID), "user")
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(AuthResponse{Error: "Token generation failed"})
+		return
+	}
+
+	// Create user object for response
+	user := User{
+		ID:        int(userID),
+		Username:  username,
+		Role:      "user",
+		Email:     req.Email,
+		Status:    "active",
+		CreatedAt: time.Now(),
+		ExpiresAt: expiresAt,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"token":    token,
+		"user":     user,
+		"username": username,
+		"package":  pkg,
+		"message":  "Account created successfully! Your VPN username is: " + username,
+		"success":  true,
+	})
+}
+
 // Simple password hashing (use bcrypt in production)
 func hashPassword(password string) string {
 	return password // Placeholder - use bcrypt or similar in production

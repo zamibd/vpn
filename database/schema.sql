@@ -8,17 +8,22 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100),
+    full_name VARCHAR(200),
     role ENUM('admin', 'reseller', 'user') NOT NULL DEFAULT 'user',
     status ENUM('active', 'suspended') NOT NULL DEFAULT 'active',
     expires_at TIMESTAMP NULL,
+    package_id INT NULL,
     reseller_id INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (reseller_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (package_id) REFERENCES packages(id) ON DELETE SET NULL,
     INDEX(role),
     INDEX(status),
     INDEX(expires_at),
-    INDEX(reseller_id)
+    INDEX(reseller_id),
+    INDEX(package_id),
+    INDEX(email)
 );
 
 -- Resellers table (for quota management)

@@ -98,34 +98,36 @@
 
                             <div class="tab-content" id="adminTabContent">
                                 <div class="tab-pane fade show active" id="users" role="tabpanel">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Username</th>
-                                                <th>Email</th>
-                                                <th>Role</th>
-                                                <th>Status</th>
-                                                <th>Expires</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="usersTableBody">
-                                        </tbody>
-                                    </table>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Username</th>
+                                                    <th>Email</th>
+                                                    <th>Role</th>
+                                                    <th>Status</th>
+                                                    <th>Expires</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="usersTableBody">
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
 
                                 <div class="tab-pane fade" id="resellerManage" role="tabpanel">
                                     <h6>Set Reseller Quota</h6>
                                     <div class="row mb-3">
-                                        <div class="col-md-6">
+                                        <div class="col-sm-6 mb-2">
                                             <input type="number" class="form-control" id="resellerIdInput" placeholder="Reseller ID">
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-sm-6 mb-2">
                                             <input type="number" class="form-control" id="quotaInput" placeholder="User Quota">
                                         </div>
                                     </div>
-                                    <button class="btn btn-primary" onclick="setResellerQuota()">Set Quota</button>
+                                    <button class="btn btn-primary w-100 w-sm-auto" onclick="setResellerQuota()">Set Quota</button>
                                 </div>
                             </div>
                         </div>
@@ -187,19 +189,21 @@
                             </form>
 
                             <h5 class="mt-5 mb-3">My Users</h5>
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Username</th>
-                                        <th>Email</th>
-                                        <th>Status</th>
-                                        <th>Expires</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="resellerUsersTableBody">
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Username</th>
+                                            <th>Email</th>
+                                            <th>Status</th>
+                                            <th>Expires</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resellerUsersTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

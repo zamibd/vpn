@@ -15,7 +15,10 @@ import (
 var db *sql.DB
 
 func init() {
-	godotenv.Load(".env")
+	// Try to load .env.local first for localhost development, fallback to .env
+	if err := godotenv.Load(".env.local"); err != nil {
+		godotenv.Load(".env")
+	}
 }
 
 // CORS middleware
@@ -62,6 +65,7 @@ func main() {
 
 	// Public routes
 	router.HandleFunc("/api/auth/register", RegisterHandler).Methods("POST", "OPTIONS")
+	router.HandleFunc("/api/auth/signup", PublicRegisterHandler).Methods("POST", "OPTIONS")
 	router.HandleFunc("/api/auth/login", LoginHandler).Methods("POST", "OPTIONS")
 
 	// Protected routes - use Handle for http.Handler
@@ -85,7 +89,7 @@ func main() {
 	router.HandleFunc("/api/packages", GetPackages).Methods("GET", "OPTIONS")
 
 	// Static files
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("../frontend")))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend")))
 
 	// Apply CORS middleware to all routes
 	handler := CORSMiddleware(router)
